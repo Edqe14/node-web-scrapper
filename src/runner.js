@@ -14,16 +14,18 @@ const HTMLParser = require('node-html-parser');
 const chance = new Chance();
 const { data: proxies } = require('./proxies/tested.json');
 const id = process.argv[2] ?? chance.bb_pin();
+const failed = [];
 
 async function fetch(url, proxy) {
   let ops = {
-    timeout: 5000
+    timeout: 10000
   };
+
   if (proxy) {
     if (!proxy.startsWith('http')) proxy = `http://${proxy}`;
 
     const agent = new ProxyAgent(proxy);
-    ops = { agent };
+    ops = { agent, ...ops };
   }
 
   const html = await get(url, ops).text();
@@ -65,28 +67,28 @@ async function fetch(url, proxy) {
     metas
   });
 
-  // await newEntry.save();
-  console.log(newEntry);
+  await newEntry.save();
 }
 
 async function run() {
   const rand = chance.ip();
-  // const proxy = `http://${proxies[~~(Math.random() * proxies.length)]}`;
+  const proxy = `http://${proxies[~~(Math.random() * proxies.length)]}`;
 
-  // if (await WebMeta.find({ url: rand }).count().exec() !== 0) return run();
+  if (failed.includes(rand) || await WebMeta.find({ url: rand }).count().exec() !== 0) return run();
 
   try {
     await fetch(`http://${rand}`);
-    console.log(`Scrapped ${rand}`);
+    console.log(`(${id}) Scrapped ${rand}`);
   } catch(e) {
-    console.log(`Err fetching ${rand}: ${e?.message}`);
+    // console.log(`(${id}) Err fetching ${rand}: ${e?.message}`);
+    failed.push(rand);
   }
 
   run();
 }
 
 async function main() {
-  // await connectDb().then(() => console.log('Database connected'));
+  await connectDb().then(() => console.log('Database connected'));
   
   console.log(`(${id}) starting runner`);
 

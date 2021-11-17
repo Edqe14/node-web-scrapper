@@ -5,10 +5,12 @@ const Chance = require('chance');
 
 const chance = new Chance();
 const runners = {};
-const AMOUNT = 10;
+const AMOUNT = parseInt(Number.isNaN(process.argv[2]) ? 10 : process.argv[2], 10);
 
 async function main() {
   await proxyTester();
+
+  console.log(`spawning ${AMOUNT} workers`);
 
   for (let i = 0; i < AMOUNT; i++) {
     const id = chance.bb_pin();
