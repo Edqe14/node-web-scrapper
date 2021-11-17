@@ -13,6 +13,7 @@ const HTMLParser = require('node-html-parser');
 
 const chance = new Chance();
 const { data: proxies } = require('./proxies/tested.json');
+const id = process.argv[2] ?? chance.bb_pin();
 
 async function fetch(url, proxy) {
   let ops = {
@@ -64,13 +65,15 @@ async function fetch(url, proxy) {
     metas
   });
 
-  await newEntry.save();
+  // await newEntry.save();
+  console.log(newEntry);
 }
 
 async function run() {
   const rand = chance.ip();
+  // const proxy = `http://${proxies[~~(Math.random() * proxies.length)]}`;
 
-  if (await WebMeta.find({ url: rand }).count().exec() !== 0) return run();
+  // if (await WebMeta.find({ url: rand }).count().exec() !== 0) return run();
 
   try {
     await fetch(`http://${rand}`);
@@ -83,7 +86,9 @@ async function run() {
 }
 
 async function main() {
-  await connectDb().then(() => console.log('Database connected'));
+  // await connectDb().then(() => console.log('Database connected'));
+  
+  console.log(`(${id}) starting runner`);
 
   run();
 }
