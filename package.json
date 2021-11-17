@@ -1,0 +1,23 @@
+{
+  "name": "node-web-crawler",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "repository": "https://github.com/Edqe14/node-web-crawler.git",
+  "author": "Edqe14 <34704796+Edqe14@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "chance": "^1.1.8",
+    "dotenv": "^10.0.0",
+    "miniget": "^4.2.1",
+    "mongoose": "^6.0.13",
+    "node-html-parser": "^5.1.0",
+    "proxy-agent": "^5.0.0",
+    "proxy-verifier": "^0.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
