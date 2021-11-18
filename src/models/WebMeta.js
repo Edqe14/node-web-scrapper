@@ -9,6 +9,10 @@ const schema = new Schema({
   title: String,
   description: String,
   metas: Object,
+  timeTook: {
+    type: Number,
+    default: null,
+  },
   createdAt: {
     type: Number,
     required: true,

@@ -14,7 +14,8 @@ const HTMLParser = require('node-html-parser');
 const chance = new Chance();
 const { data: proxies } = require('./proxies/tested.json');
 const id = process.argv[2] ?? chance.bb_pin();
-const failed = [];
+
+const done = new Set();
 
 async function fetch(url, proxy) {
   let ops = {
@@ -31,6 +32,7 @@ async function fetch(url, proxy) {
     ops = { agent, ...ops };
   }
 
+  const startTime = Date.now();
   const html = await get(url, ops).text();
 
   const document = HTMLParser.parse(html);
@@ -67,24 +69,28 @@ async function fetch(url, proxy) {
     proxy,
     title,
     description,
+    timeTook: Date.now() - startTime,
     metas
   });
 
-  await newEntry.save();
+  newEntry.save();
 }
 
 async function run() {
-  const rand = chance.ip();
+  const rand = `http://${chance.ip()}`;
   const proxy = `http://${proxies[~~(Math.random() * proxies.length)]}`;
 
-  if (failed.includes(rand) || await WebMeta.find({ url: rand }).count().exec() !== 0) return run();
+  if (done.has(rand) || await WebMeta.find({ url: rand }).count().exec() !== 0) {
+    done.add(rand);
+    return run();
+  }
 
   try {
-    await fetch(`http://${rand}`);
+    await fetch(rand);
     console.log(`(${id}) Scrapped ${rand}`);
   } catch(e) {
     // console.log(`(${id}) Err fetching ${rand}: ${e?.message}`);
-    failed.push(rand);
+    done.add(rand);
   }
 
   run();
